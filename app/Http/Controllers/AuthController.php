@@ -67,8 +67,8 @@ class AuthController extends Controller
         ];
         $req->validate($rules);
 
-        error_log('heheheeeeee');
-        error_log($req->token);
+        // error_log('heheheeeeee');
+        // error_log($req->token);
         
         $token = PersonalAccessToken::findToken($req->token);
 
