@@ -5,15 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\validator;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function register (Request $req)
+    public function register(Request $req)
     {
         //validate
-        $rules=[
+        $rules = [
             'name' => 'required|string',
             'username' => 'required|string|unique:users',
             'level' => 'required|string',
@@ -21,23 +21,23 @@ class AuthController extends Controller
             'password' => 'required|string|min:6'
         ];
         $validator = Validator::make($req->all(), $rules);
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
-        //cretae new user in users table 
+        //cretae new user in users table
         $user = User::create([
-            'name'=>$req->name,
-            'username'=>$req->username,
-            'level'=>$req->level,
-            'email'=>$req->email,
-            'password'=>Hash::make($req->password)
+            'name' => $req->name,
+            'username' => $req->username,
+            'level' => $req->level,
+            'email' => $req->email,
+            'password' => Hash::make($req->password)
         ]);
         $token = $user->createToken('Personal Access Token')->plainTextToken;
-        $response = ['user'=> $user, 'token'=>$token];
-        return response()->json($response,200);
+        $response = ['user' => $user, 'token' => $token];
+        return response()->json($response, 200);
     }
 
-    public function login (Request $req)
+    public function login(Request $req)
     {
         // validate inputs
         $rules = [
@@ -45,11 +45,7 @@ class AuthController extends Controller
             'password' => 'required|string'
         ];
         $req->validate($rules);
-        // // find user email in users table
-        // $user = User::where('email', $req->email)->first();
-        // find user email in users table
         $user = User::where('username', $req->username)->first();
-        // if user email found and password is correct
         if ($user && Hash::check($req->password, $user->password)) {
             $token = $user->createToken('Personal Access Token')->plainTextToken;
             $response = ['user' => $user, 'token' => $token];
@@ -69,7 +65,7 @@ class AuthController extends Controller
 
         // error_log('heheheeeeee');
         // error_log($req->token);
-        
+
         $token = PersonalAccessToken::findToken($req->token);
 
         if ($token) {
